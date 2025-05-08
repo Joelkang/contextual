@@ -27,8 +27,9 @@ alwaysApply: false
 - [src-tauri/tauri.conf.json](mdc:src-tauri/tauri.conf.json) configures the Tauri application
 
 ## Building
-- Development build: `npm run tauri dev`
-- Production build: `npm run tauri build`
+- Install: `bun install`
+- Development build: `bun tauri dev`
+- Production build: `bun tauri build`
 
 ## Testing
 - Run tests: `npm test`
