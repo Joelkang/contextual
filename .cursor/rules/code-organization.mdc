@@ -1,0 +1,30 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Code Organization
+
+## Frontend Architecture
+The frontend follows a component-based architecture using React and TypeScript:
+
+- [src/main.tsx](mdc:src/main.tsx) - Application entry point
+- [src/App.tsx](mdc:src/App.tsx) - Root component
+- [src/App.css](mdc:src/App.css) - Global styles
+
+## Backend Architecture
+The Tauri backend is organized as follows:
+
+- [src-tauri/src/main.rs](mdc:src-tauri/src/main.rs) - Main Rust entry point
+- [src-tauri/capabilities/](mdc:src-tauri/capabilities) - Tauri capabilities configuration
+- [src-tauri/tauri.conf.json](mdc:src-tauri/tauri.conf.json) - Application configuration
+
+## Configuration Files
+- [tsconfig.json](mdc:tsconfig.json) - TypeScript configuration
+- [vite.config.ts](mdc:vite.config.ts) - Vite bundler configuration
+- [src-tauri/Cargo.toml](mdc:src-tauri/Cargo.toml) - Rust package configuration
+
+## Development Tools
+- [scripts/](mdc:scripts) - Build and development scripts
+- [hooks/](mdc:hooks) - Reusable React hooks
+- [.github/](mdc:.github) - GitHub Actions workflows and templates

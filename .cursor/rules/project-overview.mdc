@@ -1,0 +1,28 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Project Overview
+
+This is a Tauri-based desktop application with a React frontend. The project is structured as follows:
+
+## Frontend (src/)
+- [main.tsx](mdc:src/main.tsx) - The main entry point for the React application
+- [App.tsx](mdc:src/App.tsx) - The root React component
+- [App.css](mdc:src/App.css) - Main application styles
+
+## Backend (src-tauri/)
+- [src/main.rs](mdc:src-tauri/src/main.rs) - The main Rust entry point for the Tauri backend
+- [tauri.conf.json](mdc:src-tauri/tauri.conf.json) - Tauri configuration file
+- [Cargo.toml](mdc:src-tauri/Cargo.toml) - Rust dependencies and project configuration
+
+## Configuration
+- [package.json](mdc:package.json) - Node.js dependencies and scripts
+- [tsconfig.json](mdc:tsconfig.json) - TypeScript configuration
+- [vite.config.ts](mdc:vite.config.ts) - Vite build configuration
+
+## Development
+- [scripts/](mdc:scripts) - Contains development and build scripts
+- [hooks/](mdc:hooks) - Custom React hooks
+`

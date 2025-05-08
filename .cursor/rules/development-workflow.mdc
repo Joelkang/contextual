@@ -1,0 +1,35 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Development Workflow
+
+## Getting Started
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Start the development server:
+   ```bash
+   npm run tauri dev
+   ```
+
+## Project Structure
+- Frontend code is in the [src/](mdc:src) directory
+- Backend code is in the [src-tauri/](mdc:src-tauri) directory
+- Custom React hooks are in the [hooks/](mdc:hooks) directory
+
+## Key Files
+- [package.json](mdc:package.json) contains all npm scripts and dependencies
+- [src-tauri/Cargo.toml](mdc:src-tauri/Cargo.toml) contains Rust dependencies
+- [src-tauri/tauri.conf.json](mdc:src-tauri/tauri.conf.json) configures the Tauri application
+
+## Building
+- Development build: `npm run tauri dev`
+- Production build: `npm run tauri build`
+
+## Testing
+- Run tests: `npm test`
+- Run type checking: `npm run type-check`
