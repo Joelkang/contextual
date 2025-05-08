@@ -26,9 +26,10 @@ process.chdir(path.join(import.meta.dirname, "../src-tauri"));
 const cwd = process.cwd();
 const binDir = path.join(cwd, "bin");
 
-if (!existsSync(binDir)) {
-	mkdirSync(binDir);
+if (existsSync(binDir)) {
+	rmSync(binDir, { recursive: true, force: true });
 }
+mkdirSync(binDir);
 
 async function download(url, path) {
 	const res = await fetch(url);
@@ -195,14 +196,16 @@ if (platform == "macos") {
 
 	console.log("Moved and renamed ffmpeg binary for externalBin");
 
-	console.log("Setting up Swift UI monitoring...");
+	console.log(`Setting up Swift UI monitoring (v${process.env.SCREENPIPE_VERSION})...`);
 	try {
-		const swiftSrc = mkdirSync(
-			path.join(binDir, "..", "temp", "ui_monitoring_macos.swift")
-		);
+		const swiftDir = path.join(binDir, "..", "temp");
+		if (!existsSync(swiftDir)) mkdirSync(swiftDir);
+		const swiftSrc = path.join(swiftDir, "ui_monitoring_macos.swift");
+
+		if (existsSync(swiftSrc)) rmSync(swiftSrc);
 		await download(
 			`https://raw.githubusercontent.com/mediar-ai/screenpipe/refs/tags/v${process.env.SCREENPIPE_VERSION}/screenpipe-vision/src/ui_monitoring_macos.swift`,
-			swiftSrc
+			swiftSrc,
 		);
 
 		const architectures = ["arm64", "x86_64"];
@@ -220,6 +223,7 @@ if (platform == "macos") {
 			console.log(`Swift UI monitor for ${arch} compiled successfully`);
 			await fs.chmod(outputPath, 0o755);
 		}
+		rmSync(swiftDir, { recursive: true })
 	} catch (error) {
 		console.error("Error setting up Swift UI monitoring:", error);
 		throw error;
@@ -239,18 +243,16 @@ async function installOnnxRuntime() {
 }
 
 async function installOllamaSidecar() {
-	const ollamaVersion = "v0.3.14";
-
 	let ollamaExe, ollamaUrl;
 
 	if (platform === "windows") {
 		ollamaExe = "ollama-x86_64-pc-windows-msvc.exe";
-		ollamaUrl = `https://github.com/ollama/ollama/releases/download/${ollamaVersion}/ollama-windows-amd64.zip`;
+		ollamaUrl = `https://github.com/ollama/ollama/releases/download/${process.env.OLLAMA_VERSION}/ollama-windows-amd64.zip`;
 	} else if (platform === "macos") {
-		ollamaUrl = `https://github.com/ollama/ollama/releases/download/${ollamaVersion}/ollama-darwin`;
+		ollamaUrl = `https://github.com/ollama/ollama/releases/download/${process.env.OLLAMA_VERSION}/ollama-darwin`;
 	} else if (platform === "linux") {
 		ollamaExe = "ollama-x86_64-unknown-linux-gnu";
-		ollamaUrl = `https://github.com/ollama/ollama/releases/download/${ollamaVersion}/ollama-linux-amd64.tgz`;
+		ollamaUrl = `https://github.com/ollama/ollama/releases/download/${process.env.OLLAMA_VERSION}/ollama-linux-amd64.tgz`;
 	} else {
 		throw new Error("Unsupported platform");
 	}
@@ -269,37 +271,34 @@ async function installOllamaSidecar() {
 		await fs.mkdir(binDir, { recursive: true });
 		const downloadPath = path.join(binDir, path.basename(ollamaUrl));
 
-		console.log("Downloading Ollama...");
+		console.log(`Downloading Ollama ${process.env.OLLAMA_VERSION}...`);
 		await download(ollamaUrl, downloadPath);
 
 		console.log("Extracting Ollama...");
 		if (platform === "windows") {
 			await $`powershell -command "Expand-Archive -Path '${downloadPath}' -DestinationPath '${path.join(
 				binDir,
-				".."
+				"..",
 			)}'"`;
 			await fs.rename(
 				path.join(binDir, "..", "ollama.exe"),
-				path.join(binDir, ollamaExe)
+				path.join(binDir, ollamaExe),
 			);
 		} else if (platform === "linux") {
 			await $`tar -xzf "${downloadPath}" -C "${binDir}"`;
 			await fs.rename(
 				path.join(binDir, "bin/ollama"),
-				path.join(binDir, ollamaExe)
+				path.join(binDir, ollamaExe),
 			);
-			await fs.rename(
-				path.join(binDir, "lib"),
-				path.join(binDir, "..", "lib")
-			);
+			await fs.rename(path.join(binDir, "lib"), path.join(binDir, "..", "lib"));
 		} else if (platform === "macos") {
 			await fs.copyFile(
 				downloadPath,
-				path.join(binDir, "ollama-aarch64-apple-darwin")
+				path.join(binDir, "ollama-aarch64-apple-darwin"),
 			);
 			await fs.copyFile(
 				downloadPath,
-				path.join(binDir, "ollama-x86_64-apple-darwin")
+				path.join(binDir, "ollama-x86_64-apple-darwin"),
 			);
 		}
 
@@ -307,14 +306,8 @@ async function installOllamaSidecar() {
 		if (platform === "linux") {
 			await fs.chmod(path.join(binDir, ollamaExe), "755");
 		} else if (platform === "macos") {
-			await fs.chmod(
-				path.join(binDir, "ollama-aarch64-apple-darwin"),
-				"755"
-			);
-			await fs.chmod(
-				path.join(binDir, "ollama-x86_64-apple-darwin"),
-				"755"
-			);
+			await fs.chmod(path.join(binDir, "ollama-aarch64-apple-darwin"), "755");
+			await fs.chmod(path.join(binDir, "ollama-x86_64-apple-darwin"), "755");
 		}
 
 		console.log("Cleaning up...");
